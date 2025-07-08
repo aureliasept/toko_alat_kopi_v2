@@ -9,7 +9,9 @@ if (!isset($_SESSION['user_id'])) {
 
 // Dummy data (bisa ganti dengan query dari DB)
 $totalProducts = 20;
-$totalOrders = 45;
+// Ambil data pesanan dari orders_data.php
+$ordersData = json_decode(file_get_contents('orders_data.php'), true);
+$totalOrders = is_array($ordersData) ? count($ordersData) : 0;
 $totalRevenue = 2500000;
 $pendingOrders = 8;
 // Data produk asli dari admin_products.php
@@ -213,7 +215,8 @@ while(count($products) < 20) {
       <div style="background:#fff;padding:30px 20px 20px 20px;border-radius:12px;max-width:400px;width:90vw;max-height:80vh;overflow-y:auto;position:relative;">
         <h3 style="margin-top:0;margin-bottom:15px;font-size:20px;color:#6a5acd;">Daftar Pesanan</h3>
         <button onclick="document.getElementById('ordersModal').style.display='none'" style="position:absolute;top:10px;right:15px;font-size:18px;background:none;border:none;cursor:pointer;">&times;</button>
-        <div id="ordersTable"></div>
+        <div id="ordersTotal" style="font-size:16px;font-weight:bold;color:#4361ee;margin-bottom:10px;"></div>
+        <ul id="ordersList" style="list-style:none;padding:0;margin:0;"></ul>
       </div>
     </div>
     <!-- Modal Pendapatan -->
@@ -239,13 +242,18 @@ ordersCard.onclick = function() {
   fetch('orders_data.php')
     .then(res => res.json())
     .then(data => {
-      let html = `<table style='width:100%;font-size:14px;border-collapse:collapse;'>`;
-      html += `<thead><tr style='background:#f0f0f8;color:#333;'><th style='padding:6px 4px;text-align:left;'>Nama</th><th style='padding:6px 4px;text-align:left;'>Produk</th><th style='padding:6px 4px;text-align:center;'>Jumlah</th><th style='padding:6px 4px;text-align:center;'>Status</th></tr></thead><tbody>`;
+      // Tampilkan total pesanan
+      document.getElementById('ordersTotal').innerText = `Total Pesanan: ${data.length}`;
+      // Tampilkan daftar nama pemesan dan jumlah pesanan
+      let html = '';
       data.forEach(o => {
-        html += `<tr><td style='padding:4px 2px;'>${o.nama}</td><td style='padding:4px 2px;'>${o.produk}</td><td style='padding:4px 2px;text-align:center;'>${o.jumlah}</td><td style='padding:4px 2px;text-align:center;'>${o.status}</td></tr>`;
+        html += `<li style='display:flex;align-items:center;margin-bottom:10px;background:#f4f4f4;padding:10px 8px;border-radius:8px;'>` +
+                `<span style='font-weight:600;color:#6a5acd;margin-right:10px;'>${o.nama}</span>` +
+                `<span style='color:#333;'>(${o.produk})</span>` +
+                `<span style='margin-left:auto;font-size:15px;color:#222;'>Jumlah: <b>${o.jumlah}</b></span>` +
+                `</li>`;
       });
-      html += `</tbody></table>`;
-      document.getElementById('ordersTable').innerHTML = html;
+      document.getElementById('ordersList').innerHTML = html;
       document.getElementById('ordersModal').style.display = 'flex';
     });
 };

@@ -1,17 +1,25 @@
 <?php
 header('Content-Type: application/json');
-$orders = [
-    ['nama' => 'Andi', 'produk' => 'Syphon Coffee Maker', 'jumlah' => 1, 'status' => 'Selesai'],
-    ['nama' => 'Budi', 'produk' => 'Electric Coffee Grinder', 'jumlah' => 2, 'status' => 'Diproses'],
-    ['nama' => 'Citra', 'produk' => 'French Press', 'jumlah' => 1, 'status' => 'Selesai'],
-    ['nama' => 'Dewi', 'produk' => 'Vietnam Drip', 'jumlah' => 3, 'status' => 'Pending'],
-    ['nama' => 'Eka', 'produk' => 'V60 Dripper', 'jumlah' => 1, 'status' => 'Selesai'],
+$namaList = ['Andi', 'Budi', 'Citra', 'Dewi', 'Eka', 'Fajar', 'Gita', 'Hadi', 'Intan', 'Joko'];
+$produkList = [
+    'Syphon Coffee Maker',
+    'Electric Coffee Grinder',
+    'French Press',
+    'Vietnam Drip',
+    'V60 Dripper',
+    'Coffee Server',
+    'Milk Frother',
+    'Espresso Maker',
+    'Teko Leher Angsa',
+    'Digital Scale'
 ];
-while(count($orders) < 45) {
-    foreach($orders as $o) {
-        if(count($orders) >= 45) break;
-        $orders[] = $o;
-    }
+$pending = [];
+for ($i = 0; $i < 10; $i++) {
+    $pending[] = [
+        'nama' => $namaList[$i],
+        'produk' => $produkList[array_rand($produkList)],
+        'jumlah' => rand(1, 5),
+        'status' => 'Pending'
+    ];
 }
-$pending = array_filter($orders, function($o) { return strtolower($o['status']) == 'pending'; });
-echo json_encode(array_values($pending)); 
+echo json_encode($pending); 

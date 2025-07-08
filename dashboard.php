@@ -22,8 +22,10 @@ $ordersData = json_decode($response, true);
 $totalOrders = is_array($ordersData) ? count($ordersData) : 0;
 $totalRevenue = 2500000;
 $pendingOrders = 8;
-// Data produk asli dari admin_products.php
-$products = [
+
+// Tambah produk dari form dashboard
+$produk_file = 'produk_dummy.json';
+$default_products = [
     [ 'name' => 'Syphon Coffee Maker Manual Brew Vacuum Pot', 'img' => 'https://picsum.photos/seed/coffee1/400' ],
     [ 'name' => 'Electric Coffee Grinder - 600N', 'img' => 'https://picsum.photos/seed/coffee2/400' ],
     [ 'name' => 'Coffee Server / Coffee Pot 01 / Teko Server Kopi V60', 'img' => 'https://picsum.photos/seed/coffee3/400' ],
@@ -45,13 +47,48 @@ $products = [
     [ 'name' => 'Barista Apron dengan Saku Kulit', 'img' => 'https://picsum.photos/seed/coffee19/400' ],
     [ 'name' => 'Kapas Kertas Filter V60 (Isi 100)', 'img' => 'https://picsum.photos/seed/coffee20/400' ],
 ];
-// Jika produk kurang dari 20, duplikat agar tetap 20
-while(count($products) < 20) {
-    foreach($products as $p) {
-        if(count($products) >= 20) break;
-        $products[] = $p;
+// Proses tambah produk jika ada POST
+$produk_json = [];
+if (file_exists($produk_file)) {
+    $produk_json = json_decode(file_get_contents($produk_file), true) ?: [];
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tambah_dashboard'])) {
+    $nama = $_POST['nama'] ?? '';
+    $kategori = $_POST['kategori'] ?? '';
+    $harga = $_POST['harga'] ?? '';
+    $stok = $_POST['stok'] ?? '';
+    $satuan = $_POST['satuan'] ?? '';
+    $deskripsi = $_POST['deskripsi'] ?? '';
+    $img = '';
+    if (isset($_FILES['foto']) && $_FILES['foto']['tmp_name']) {
+        $img = 'data:' . $_FILES['foto']['type'] . ';base64,' . base64_encode(file_get_contents($_FILES['foto']['tmp_name']));
+    }
+    $produk_json[] = [
+        'nama' => $nama,
+        'kategori' => $kategori,
+        'harga' => $harga,
+        'stok' => $stok,
+        'satuan' => $satuan,
+        'deskripsi' => $deskripsi,
+        'img' => $img
+    ];
+    file_put_contents($produk_file, json_encode($produk_json, JSON_PRETTY_PRINT));
+    // Redirect agar tidak resubmit saat refresh
+    header('Location: dashboard.php');
+    exit();
+}
+$products = $default_products;
+if (!empty($produk_json)) {
+    foreach ($produk_json as $p) {
+        $products[] = [
+            'name' => $p['nama'],
+            'img' => $p['img'] ?: 'https://picsum.photos/seed/coffee' . rand(1,100) . '/400',
+            'stock' => $p['stok'],
+            'price' => $p['harga']
+        ];
     }
 }
+$totalProducts = count($products);
 
 // Hapus data dummy $orders, $revenues, dan $pendingOrders
 
@@ -62,103 +99,205 @@ while(count($products) < 20) {
 <head>
     <meta charset="UTF-8">
     <title>Dashboard Admin - Toko Alat Kopi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
         }
-
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
             margin: 0;
-            background: #f1f3f8;
+            background: linear-gradient(135deg, #f1f3f8 60%, #e0e7ff 100%);
         }
-
         .navbar {
-            background: #6a5acd;
+            background: linear-gradient(90deg, #6a5acd 60%, #7b2ff2 100%);
             color: white;
-            padding: 15px 30px;
+            padding: 18px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 4px 18px rgba(106,90,205,0.10);
         }
-
         .navbar-left {
             font-weight: bold;
-            font-size: 18px;
+            font-size: 22px;
+            letter-spacing: 1px;
         }
-
         .navbar-right a {
             color: white;
-            margin-left: 20px;
+            margin-left: 28px;
             text-decoration: none;
             font-weight: 500;
+            font-size: 16px;
+            transition: color 0.2s;
         }
-
+        .navbar-right a:hover {
+            color: #ffe082;
+        }
         .container {
-            padding: 40px;
+            padding: 50px 0 0 0;
+            max-width: 1200px;
+            margin: 0 auto;
         }
-
         .welcome {
             background: white;
-            border-radius: 12px;
-            padding: 30px;
-            margin-bottom: 30px;
+            border-radius: 18px;
+            padding: 38px 30px 30px 30px;
+            margin-bottom: 38px;
             text-align: center;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            box-shadow: 0 6px 24px rgba(106,90,205,0.10);
         }
-
         .welcome h2 {
             margin-bottom: 10px;
             color: #333;
+            font-size: 2rem;
+            font-weight: 700;
         }
-
         .stats {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 28px;
             justify-content: space-between;
         }
-
         .card {
             flex: 1;
-            min-width: 200px;
+            min-width: 220px;
             background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            border-radius: 18px;
+            padding: 32px 20px 28px 20px;
+            box-shadow: 0 6px 24px rgba(106,90,205,0.10);
             text-align: center;
+            transition: box-shadow 0.2s, transform 0.2s, background 0.2s;
+            cursor: pointer;
         }
-
+        .card:hover {
+            box-shadow: 0 16px 40px rgba(123,47,242,0.18);
+            transform: translateY(-6px) scale(1.03);
+            background: #f6f7ff;
+        }
         .card-icon {
-            font-size: 35px;
-            margin-bottom: 10px;
+            font-size: 40px;
+            margin-bottom: 12px;
         }
-
         .card-number {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: bold;
             color: #6a5acd;
         }
-
         .card-label {
-            font-size: 14px;
+            font-size: 15px;
             color: #555;
+            margin-top: 4px;
         }
-
-        .card-link {
-            text-decoration: none;
-            color: inherit;
-            display: block;
+        @media (max-width: 900px) {
+            .stats { flex-direction: column; gap: 18px; }
         }
-        .card-link:focus .card, .card-link:hover .card {
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.25);
-            transform: translateY(-5px) scale(1.03);
-            background: #f0f4ff;
+        /* Modal styling */
+        #ordersModal, #productsModal, #revenueModal, #pendingOrdersModal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0; top: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(60, 60, 90, 0.18);
+            backdrop-filter: blur(2px);
+            align-items: center;
+            justify-content: center;
+            animation: fadeInBg 0.3s;
         }
-
-        @media (max-width: 768px) {
-            .stats {
-                flex-direction: column;
+        @keyframes fadeInBg {
+            from { background: rgba(60,60,90,0); }
+            to { background: rgba(60,60,90,0.18); }
+        }
+        #ordersModal > div, #productsModal > div, #revenueModal > div, #pendingOrdersModal > div {
+            background: #fff;
+            padding: 32px 20px 20px 20px;
+            border-radius: 16px;
+            max-width: 420px;
+            width: 92vw;
+            max-height: 82vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(123,47,242,0.13);
+            animation: popIn 0.25s;
+        }
+        @keyframes popIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 22px;
+            color: #6a5acd;
+            font-weight: 700;
+        }
+        button[onclick*='Modal'] {
+            position: absolute;
+            top: 10px; right: 15px;
+            font-size: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #6a5acd;
+            transition: color 0.2s;
+        }
+        button[onclick*='Modal']:hover {
+            color: #7b2ff2;
+        }
+        /* List in modal */
+        #ordersList li, #productsList li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            background: #f4f4f4;
+            padding: 10px 8px;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+        #ordersList li span:first-child, #productsList li span, #productsList li img {
+            font-weight: 600;
+            color: #6a5acd;
+        }
+        #ordersList li span {
+            margin-right: 10px;
+        }
+        #ordersList li span:last-child {
+            margin-left: auto;
+            color: #222;
+        }
+        #productsList li img {
+            width: 32px; height: 32px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-right: 10px;
+            background: #eaeaea;
+        }
+        /* Table in modal */
+        table {
+            width: 100%;
+            font-size: 15px;
+            border-collapse: collapse;
+        }
+        thead tr {
+            background: #f0f0f8;
+            color: #333;
+        }
+        th, td {
+            padding: 7px 4px;
+            text-align: left;
+        }
+        th {
+            font-weight: 600;
+        }
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            background: #f0f0f8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d1c4e9;
+            border-radius: 6px;
         }
     </style>
 </head>
@@ -180,31 +319,74 @@ while(count($products) < 20) {
             <h2>Selamat Datang di Dashboard Admin</h2>
             <p>Kelola toko alat kopi Anda dengan mudah dan efisien</p>
         </div>
-
         <div class="stats">
             <div class="card" id="totalProductsCard" style="cursor:pointer;">
                 <div class="card-icon">📦</div>
                 <div class="card-number"><?php echo $totalProducts; ?></div>
                 <div class="card-label">Total Produk</div>
             </div>
-
+            <div class="card" id="addProductCard" style="cursor:pointer;">
+                <div class="card-icon">➕</div>
+                <div class="card-number" style="color:#6a5acd;font-size:28px;font-weight:bold;">Tambah</div>
+                <div class="card-label">Tambah Produk</div>
+            </div>
             <div class="card" id="totalOrdersCard" style="cursor:pointer;">
                 <div class="card-icon">🛒</div>
                 <div class="card-number"><?php echo $totalOrders; ?></div>
                 <div class="card-label">Total Pesanan</div>
             </div>
-
             <div class="card" id="revenueCard" style="cursor:pointer;">
                 <div class="card-icon">💰</div>
                 <div class="card-number">Rp <?php echo number_format($totalRevenue, 0, ',', '.'); ?></div>
                 <div class="card-label">Pendapatan</div>
             </div>
-
             <div class="card" id="pendingOrdersCard" style="cursor:pointer;">
                 <div class="card-icon">⏳</div>
                 <div class="card-number"><?php echo $pendingOrders; ?></div>
                 <div class="card-label">Pesanan Pending</div>
             </div>
+        </div>
+        <!-- Modal Tambah Produk -->
+        <div id="addProductModal" style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100vw;height:100vh;background:rgba(60,60,90,0.18);backdrop-filter:blur(2px);align-items:center;justify-content:center;">
+          <div style="background:#fff;padding:32px 20px 20px 20px;border-radius:16px;max-width:420px;width:92vw;max-height:82vh;overflow-y:auto;position:relative;box-shadow:0 8px 32px rgba(123,47,242,0.13);animation:popIn 0.25s;">
+            <h3 style="margin-top:0;margin-bottom:15px;font-size:22px;color:#6a5acd;font-weight:700;">Tambah Produk</h3>
+            <button onclick="document.getElementById('addProductModal').style.display='none'" style="position:absolute;top:10px;right:15px;font-size:20px;background:none;border:none;cursor:pointer;color:#6a5acd;">&times;</button>
+            <form method="POST" enctype="multipart/form-data" id="formTambahDashboard">
+                <input type="hidden" name="tambah_dashboard" value="1">
+                <label>Kategori</label>
+                <select name="kategori" required>
+                    <option value="">Pilih kategori</option>
+                    <option>Kopi</option>
+                    <option>Alat Seduh</option>
+                    <option>Mesin</option>
+                    <option>Aksesoris</option>
+                </select>
+                <label>Nama Produk</label>
+                <input type="text" name="nama" required>
+                <div style="display:flex;gap:10px;">
+                    <div style="flex:1;">
+                        <label>Harga</label>
+                        <input type="number" name="harga" min="0" required>
+                    </div>
+                    <div style="flex:1;">
+                        <label>Stok</label>
+                        <input type="number" name="stok" min="0" required>
+                    </div>
+                </div>
+                <div style="display:flex;gap:10px;">
+                    <div style="flex:1;">
+                        <label>Satuan</label>
+                        <input type="text" name="satuan" required>
+                    </div>
+                </div>
+                <label>Deskripsi</label>
+                <textarea name="deskripsi" required style="resize:vertical;"></textarea>
+                <label>Foto</label><br>
+                <input type="file" name="foto" id="fotoInputDashboard" accept="image/*">
+                <div id="fotoPreviewDashboard"></div>
+                <button type="submit" style="width:100%;padding:12px 0;background:linear-gradient(90deg,#6a5acd,#7b2ff2);color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;margin-top:8px;">Tambah Produk</button>
+            </form>
+          </div>
         </div>
     </div>
 
@@ -240,7 +422,7 @@ while(count($products) < 20) {
         <button onclick="document.getElementById('productsModal').style.display='none'" style="position:absolute;top:10px;right:15px;font-size:18px;background:none;border:none;cursor:pointer;">&times;</button>
         <div id="productsTotal" style="font-size:16px;font-weight:bold;color:#4361ee;margin-bottom:10px;">Total Produk: <?php echo $totalProducts; ?></div>
         <ul id="productsList" style="list-style:none;padding:0;margin:0;">
-          <?php foreach(array_slice($products,0,20) as $p): ?>
+          <?php foreach($products as $p): ?>
             <li style='display:flex;align-items:center;margin-bottom:10px;background:#f4f4f4;padding:10px 8px;border-radius:8px;'>
               <img src="<?php echo $p['img']; ?>" alt="<?php echo htmlspecialchars($p['name']); ?>" style="width:32px;height:32px;object-fit:cover;border-radius:6px;margin-right:10px;background:#eaeaea;">
               <span style='font-weight:600;color:#6a5acd;'><?php echo htmlspecialchars($p['name']); ?></span>
@@ -307,6 +489,23 @@ pendingOrdersCard.onclick = function() {
 const productsCard = document.getElementById('totalProductsCard');
 productsCard.onclick = function() {
   document.getElementById('productsModal').style.display = 'flex';
+};
+document.getElementById('fotoInputDashboard').onchange = function(e) {
+    if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            document.getElementById('fotoPreviewDashboard').innerHTML = `<img src='${ev.target.result}' style='width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #d1c4e9;margin-bottom:10px;' />`;
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    } else {
+        document.getElementById('fotoPreviewDashboard').innerHTML = '';
+    }
+};
+// Show/hide modal tambah produk
+const addProductCard = document.getElementById('addProductCard');
+const addProductModal = document.getElementById('addProductModal');
+addProductCard.onclick = function() {
+    addProductModal.style.display = 'flex';
 };
 </script>
 </body>

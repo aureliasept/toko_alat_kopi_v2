@@ -33,6 +33,11 @@ session_start();
             width: 100%;
             max-width: 400px;
             text-align: center;
+            animation: fadeInUp 0.7s cubic-bezier(.39,.575,.565,1.000);
+        }
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(40px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
         .logo {
@@ -109,9 +114,11 @@ session_start();
             color: #d63031;
             padding: 12px;
             border-radius: 8px;
-            margin-top: 20px;
-            font-size: 14px;
+            margin-bottom: 20px;
+            font-size: 15px;
             border-left: 4px solid #d63031;
+            text-align: left;
+            word-break: break-word;
         }
 
         .coffee-icon {
@@ -129,6 +136,10 @@ session_start();
             .logo h1 {
                 font-size: 24px;
             }
+            .error-message {
+                font-size: 13px;
+                padding: 10px;
+            }
         }
     </style>
 </head>
@@ -139,28 +150,46 @@ session_start();
             <h1>Toko Alat Kopi</h1>
             <p>Silakan login untuk melanjutkan</p>
         </div>
-        
-        <!-- Form login -->
-        <form method="POST" action="login_process.php">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" placeholder="Masukkan username Anda" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="Masukkan password Anda" required>
-            </div>
-            
-            <button type="submit" class="login-btn">Login</button>
-        </form>
-
         <?php
         // Tampilkan pesan error jika ada
         if(isset($_GET['error'])) {
-            echo "<div class='error-message'>" . htmlspecialchars($_GET['error']) . "</div>";
+            echo "<div class='error-message' id='error-message'>" . htmlspecialchars($_GET['error']) . "</div>";
         }
         ?>
+        <!-- Form login -->
+        <form method="POST" action="login_process.php" id="loginForm" autocomplete="off">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Masukkan username Anda" required autofocus>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div style="position:relative;">
+                    <input type="password" id="password" name="password" placeholder="Masukkan password Anda" required style="padding-right:40px;">
+                    <span id="togglePassword" style="position:absolute;top:50%;right:12px;transform:translateY(-50%);cursor:pointer;font-size:18px;color:#764ba2;user-select:none;">👁️</span>
+                </div>
+            </div>
+            <button type="submit" class="login-btn" id="loginBtn">Login</button>
+        </form>
+        <script>
+        // Show/hide password
+        document.getElementById('togglePassword').onclick = function() {
+            var pwd = document.getElementById('password');
+            if (pwd.type === 'password') {
+                pwd.type = 'text';
+                this.textContent = '🙈';
+            } else {
+                pwd.type = 'password';
+                this.textContent = '👁️';
+            }
+        };
+        // Animasi loading pada tombol login
+        document.getElementById('loginForm').onsubmit = function() {
+            var btn = document.getElementById('loginBtn');
+            btn.disabled = true;
+            btn.textContent = 'Loading...';
+        };
+        </script>
     </div>
 </body>
 </html>

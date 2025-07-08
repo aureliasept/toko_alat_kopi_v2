@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-$namaList = ['Andi', 'Budi', 'Citra', 'Dewi', 'Eka', 'Fajar', 'Gita', 'Hadi', 'Intan', 'Joko'];
+$namaList = ['Andi', 'Budi', 'Citra', 'Dewi', 'Eka', 'Fajar', 'Gita', 'Hadi'];
 $produkList = [
     'Syphon Coffee Maker',
     'Electric Coffee Grinder',
@@ -9,12 +9,10 @@ $produkList = [
     'V60 Dripper',
     'Coffee Server',
     'Milk Frother',
-    'Espresso Maker',
-    'Teko Leher Angsa',
-    'Digital Scale'
+    'Espresso Maker'
 ];
 $pending = [];
-for ($i = 0; $i < 10; $i++) {
+for ($i = 0; $i < 8; $i++) {
     $pending[] = [
         'nama' => $namaList[$i],
         'produk' => $produkList[array_rand($produkList)],

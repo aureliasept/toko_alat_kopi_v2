@@ -156,41 +156,44 @@ $totalProducts = count($products);
         .stats {
             display: flex;
             flex-wrap: wrap;
-            gap: 28px;
+            gap: 18px;
             justify-content: space-between;
         }
         .card {
             flex: 1;
-            min-width: 220px;
+            min-width: 150px;
+            max-width: 180px;
             background: white;
-            border-radius: 18px;
-            padding: 32px 20px 28px 20px;
-            box-shadow: 0 6px 24px rgba(106,90,205,0.10);
+            border-radius: 13px;
+            padding: 18px 10px 16px 10px;
+            box-shadow: 0 4px 16px rgba(106,90,205,0.10);
             text-align: center;
-            transition: box-shadow 0.2s, transform 0.2s, background 0.2s;
+            transition: box-shadow 0.18s, transform 0.18s, background 0.18s;
             cursor: pointer;
+            margin: 0 auto;
         }
         .card:hover {
-            box-shadow: 0 16px 40px rgba(123,47,242,0.18);
-            transform: translateY(-6px) scale(1.03);
-            background: #f6f7ff;
+            box-shadow: 0 10px 28px rgba(123,47,242,0.13);
+            transform: translateY(-4px) scale(1.04);
+            background: #f7f8fd;
         }
         .card-icon {
-            font-size: 40px;
-            margin-bottom: 12px;
+            font-size: 28px;
+            margin-bottom: 7px;
         }
         .card-number {
-            font-size: 32px;
+            font-size: 22px;
             font-weight: bold;
             color: #6a5acd;
         }
         .card-label {
-            font-size: 15px;
+            font-size: 13px;
             color: #555;
-            margin-top: 4px;
+            margin-top: 2px;
         }
         @media (max-width: 900px) {
-            .stats { flex-direction: column; gap: 18px; }
+            .stats { flex-direction: column; gap: 12px; }
+            .card { max-width: 100%; min-width: 0; }
         }
         /* Modal styling */
         #ordersModal, #productsModal, #revenueModal, #pendingOrdersModal {
@@ -463,41 +466,41 @@ $totalProducts = count($products);
             <p>Kelola toko alat kopi Anda dengan mudah dan efisien</p>
         </div>
         <div class="stats">
-            <div class="card" id="totalProductsCard" style="cursor:pointer;">
+            <a href="products_page.php" class="card" id="totalProductsCard">
                 <div class="card-icon">📦</div>
                 <div class="card-number"><?php echo $totalProducts; ?></div>
                 <div class="card-label">Total Produk</div>
-            </div>
-            <div class="card" id="addProductCard" style="cursor:pointer;">
+            </a>
+            <a href="add_product_page.php" class="card" id="addProductCard">
                 <div class="card-icon">➕</div>
                 <div class="card-number" style="color:#6a5acd;font-size:28px;font-weight:bold;">Tambah</div>
                 <div class="card-label">Tambah Produk</div>
-            </div>
-            <div class="card" id="totalOrdersCard" style="cursor:pointer;">
+            </a>
+            <a href="orders_page.php" class="card" id="totalOrdersCard">
                 <div class="card-icon">🛒</div>
                 <div class="card-number"><?php echo $totalOrders; ?></div>
                 <div class="card-label">Total Pesanan</div>
-            </div>
-            <div class="card" id="detailOrdersCard" style="cursor:pointer;">
+            </a>
+            <a href="detail_orders_page.php" class="card" id="detailOrdersCard">
                 <div class="card-icon">📄</div>
                 <div class="card-number" style="color:#6a5acd;font-size:28px;font-weight:bold;">Detail</div>
                 <div class="card-label">Detail Pesanan</div>
-            </div>
-            <div class="card" id="invoiceCard" style="cursor:pointer;">
+            </a>
+            <a href="invoice.php" class="card" id="invoiceCard" target="_blank">
                 <div class="card-icon">🧾</div>
                 <div class="card-number" style="color:#6a5acd;font-size:28px;font-weight:bold;">Invoice</div>
                 <div class="card-label">Invoice</div>
-            </div>
-            <div class="card" id="revenueCard" style="cursor:pointer;">
+            </a>
+            <a href="revenues_page.php" class="card" id="revenueCard">
                 <div class="card-icon">💰</div>
                 <div class="card-number">Rp <?php echo number_format($totalRevenue, 0, ',', '.'); ?></div>
                 <div class="card-label">Pendapatan</div>
-            </div>
-            <div class="card" id="pendingOrdersCard" style="cursor:pointer;">
+            </a>
+            <a href="pending_orders_page.php" class="card" id="pendingOrdersCard">
                 <div class="card-icon">⏳</div>
                 <div class="card-number"><?php echo $pendingOrders; ?></div>
                 <div class="card-label">Pesanan Pending</div>
-            </div>
+            </a>
         </div>
         <!-- Modal Tambah Produk -->
         <div id="addProductModal" style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100vw;height:100vh;background:rgba(60,60,90,0.18);backdrop-filter:blur(2px);align-items:center;justify-content:center;">

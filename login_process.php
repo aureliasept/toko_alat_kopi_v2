@@ -3,29 +3,33 @@ session_start();
 require_once 'config/db.php';
 
 // Ambil data dari form login
-$username = $_POST['username'];
-$password = $_POST['password'];
-
-// Query untuk mencari user berdasarkan username
-$sql = "SELECT * FROM users WHERE username='$username'";
-$result = $conn->query($sql);
-
+default:
+$username = trim($_POST['username'] ?? '');
+$password = trim($_POST['password'] ?? '');
+if ($username === '' || $password === '') {
+    header('Location: login.php?error=Username dan password wajib diisi');
+    exit();
+}
+// Query untuk mencari user berdasarkan username (prepared statement)
+$stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+$stmt->bind_param("s", $username);
+$stmt->execute();
+$result = $stmt->get_result();
 if ($result->num_rows > 0) {
-    // Ambil data user
     $user = $result->fetch_assoc();
-    
-    // Verifikasi password dengan password_verify
     if (password_verify($password, $user['password'])) {
-        // Jika password benar, simpan data user di session
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
-        header('Location: dashboard.php');  // Redirect ke dashboard admin
+        header('Location: dashboard.php');
+        exit();
     } else {
-        // Jika password salah
+        sleep(1); // Delay untuk keamanan
         header('Location: login.php?error=Password salah');
+        exit();
     }
 } else {
-    // Jika user tidak ditemukan
+    sleep(1); // Delay untuk keamanan
     header('Location: login.php?error=User tidak ditemukan');
+    exit();
 }
 ?>

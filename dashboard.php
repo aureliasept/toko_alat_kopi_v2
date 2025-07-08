@@ -9,8 +9,16 @@ if (!isset($_SESSION['user_id'])) {
 
 // Dummy data (bisa ganti dengan query dari DB)
 $totalProducts = 20;
-// Ambil data pesanan dari orders_data.php
-$ordersData = json_decode(file_get_contents('orders_data.php'), true);
+// Ambil data pesanan dari orders_data.php via cURL
+$curl = curl_init();
+curl_setopt_array($curl, [
+    CURLOPT_URL => 'http://localhost/toko_alat_kopi1/orders_data.php',
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_FOLLOWLOCATION => true,
+]);
+$response = curl_exec($curl);
+curl_close($curl);
+$ordersData = json_decode($response, true);
 $totalOrders = is_array($ordersData) ? count($ordersData) : 0;
 $totalRevenue = 2500000;
 $pendingOrders = 8;
@@ -174,21 +182,11 @@ while(count($products) < 20) {
         </div>
 
         <div class="stats">
-            <a href="total_produk.php" class="card-link">
-                <div class="card">
-                    <div class="card-icon">📦</div>
-                    <div class="card-number"><?php echo $totalProducts; ?></div>
-                    <div class="card-label">Total Produk</div>
-                    <ul style="list-style:none;padding:0;margin:15px 0 0 0;max-height:300px;overflow-y:auto;">
-                        <?php foreach(array_slice($products,0,20) as $p): ?>
-                            <li style="display:flex;align-items:center;margin-bottom:8px;">
-                                <img src="<?php echo $p['img']; ?>" alt="<?php echo htmlspecialchars($p['name']); ?>" style="width:32px;height:32px;object-fit:cover;border-radius:6px;margin-right:10px;background:#eaeaea;">
-                                <span style="font-size:14px;color:#333;"> <?php echo htmlspecialchars($p['name']); ?> </span>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-            </a>
+            <div class="card" id="totalProductsCard" style="cursor:pointer;">
+                <div class="card-icon">📦</div>
+                <div class="card-number"><?php echo $totalProducts; ?></div>
+                <div class="card-label">Total Produk</div>
+            </div>
 
             <div class="card" id="totalOrdersCard" style="cursor:pointer;">
                 <div class="card-icon">🛒</div>
@@ -233,6 +231,22 @@ while(count($products) < 20) {
         <h3 style="margin-top:0;margin-bottom:15px;font-size:20px;color:#6a5acd;">Pesanan Pending</h3>
         <button onclick="document.getElementById('pendingOrdersModal').style.display='none'" style="position:absolute;top:10px;right:15px;font-size:18px;background:none;border:none;cursor:pointer;">&times;</button>
         <div id="pendingOrdersTable"></div>
+      </div>
+    </div>
+    <!-- Modal Produk -->
+    <div id="productsModal" style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.3);align-items:center;justify-content:center;">
+      <div style="background:#fff;padding:30px 20px 20px 20px;border-radius:12px;max-width:400px;width:90vw;max-height:80vh;overflow-y:auto;position:relative;">
+        <h3 style="margin-top:0;margin-bottom:15px;font-size:20px;color:#6a5acd;">Daftar Produk</h3>
+        <button onclick="document.getElementById('productsModal').style.display='none'" style="position:absolute;top:10px;right:15px;font-size:18px;background:none;border:none;cursor:pointer;">&times;</button>
+        <div id="productsTotal" style="font-size:16px;font-weight:bold;color:#4361ee;margin-bottom:10px;">Total Produk: <?php echo $totalProducts; ?></div>
+        <ul id="productsList" style="list-style:none;padding:0;margin:0;">
+          <?php foreach(array_slice($products,0,20) as $p): ?>
+            <li style='display:flex;align-items:center;margin-bottom:10px;background:#f4f4f4;padding:10px 8px;border-radius:8px;'>
+              <img src="<?php echo $p['img']; ?>" alt="<?php echo htmlspecialchars($p['name']); ?>" style="width:32px;height:32px;object-fit:cover;border-radius:6px;margin-right:10px;background:#eaeaea;">
+              <span style='font-weight:600;color:#6a5acd;'><?php echo htmlspecialchars($p['name']); ?></span>
+            </li>
+          <?php endforeach; ?>
+        </ul>
       </div>
     </div>
 <script>
@@ -288,6 +302,11 @@ pendingOrdersCard.onclick = function() {
       document.getElementById('pendingOrdersTable').innerHTML = html;
       document.getElementById('pendingOrdersModal').style.display = 'flex';
     });
+};
+// Produk
+const productsCard = document.getElementById('totalProductsCard');
+productsCard.onclick = function() {
+  document.getElementById('productsModal').style.display = 'flex';
 };
 </script>
 </body>

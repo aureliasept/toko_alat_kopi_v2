@@ -299,6 +299,151 @@ $totalProducts = count($products);
             background: #d1c4e9;
             border-radius: 6px;
         }
+        /* Modal Detail Pesanan */
+        #detailOrdersModal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0; top: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(60, 60, 90, 0.18);
+            backdrop-filter: blur(2px);
+            align-items: center;
+            justify-content: center;
+            animation: fadeInBg 0.3s;
+        }
+        #detailOrdersModal > div {
+            background: #fff;
+            padding: 32px 20px 20px 20px;
+            border-radius: 16px;
+            max-width: 700px;
+            width: 98vw;
+            max-height: 82vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(123,47,242,0.13);
+            animation: popIn 0.25s;
+        }
+        #detailOrdersModal h3 {
+            text-align: center;
+            color: #6a5acd;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 18px;
+            margin-top: 0;
+            letter-spacing: 0.5px;
+        }
+        #detailOrdersTable table {
+            width: 100%;
+            font-size: 15px;
+            border-collapse: collapse;
+            margin-bottom: 0;
+        }
+        #detailOrdersTable thead tr {
+            background: #f3f2fa;
+        }
+        #detailOrdersTable th, #detailOrdersTable td {
+            padding: 10px 8px;
+            text-align: left;
+        }
+        #detailOrdersTable th {
+            font-weight: 700;
+            color: #5f4bb6;
+            font-size: 15px;
+            border-bottom: 2px solid #e0e0f0;
+        }
+        #detailOrdersTable td {
+            border-bottom: 1px solid #f0f0f8;
+            font-size: 15px;
+        }
+        #detailOrdersTable tr:nth-child(even) {
+            background: #faf9fd;
+        }
+        #detailOrdersTable td:nth-child(1),
+        #detailOrdersTable th:nth-child(1) {
+            text-align: center;
+            width: 36px;
+        }
+        #detailOrdersTable td:nth-child(4),
+        #detailOrdersTable th:nth-child(4),
+        #detailOrdersTable td:nth-child(5),
+        #detailOrdersTable th:nth-child(5),
+        #detailOrdersTable td:nth-child(6),
+        #detailOrdersTable th:nth-child(6) {
+            text-align: right;
+        }
+        #detailOrdersTable td:nth-child(6) {
+            font-weight: bold;
+            color: #6a5acd;
+        }
+        #detailOrdersTable td:last-child, #detailOrdersTable th:last-child {
+            text-align: center;
+        }
+        @media (max-width: 600px) {
+            #detailOrdersModal > div { padding: 18px 2vw 12px 2vw; }
+            #detailOrdersTable th, #detailOrdersTable td { padding: 7px 2px; font-size: 13px; }
+            #detailOrdersModal h3 { font-size: 18px; }
+        }
+        #revenueModal > div {
+            background: #fff;
+            padding: 32px 20px 20px 20px;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 96vw;
+            max-height: 82vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(123,47,242,0.13);
+            animation: popIn 0.25s;
+        }
+        #revenueModal h3 {
+            text-align: center;
+            color: #6a5acd;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 18px;
+            margin-top: 0;
+            letter-spacing: 0.5px;
+        }
+        #revenuesTable table {
+            width: 100%;
+            font-size: 15px;
+            border-collapse: collapse;
+            margin-bottom: 0;
+        }
+        #revenuesTable thead tr {
+            background: #f3f2fa;
+        }
+        #revenuesTable th, #revenuesTable td {
+            padding: 10px 8px;
+            text-align: left;
+        }
+        #revenuesTable th {
+            font-weight: 700;
+            color: #5f4bb6;
+            font-size: 15px;
+            border-bottom: 2px solid #e0e0f0;
+        }
+        #revenuesTable td {
+            border-bottom: 1px solid #f0f0f8;
+            font-size: 15px;
+        }
+        #revenuesTable tr:nth-child(even) {
+            background: #faf9fd;
+        }
+        #revenuesTable td:nth-child(2), #revenuesTable th:nth-child(2) {
+            text-align: right;
+            font-weight: bold;
+            color: #6a5acd;
+        }
+        #revenuesTable td:last-child, #revenuesTable th:last-child {
+            text-align: left;
+        }
+        @media (max-width: 600px) {
+            #revenueModal > div { padding: 18px 2vw 12px 2vw; }
+            #revenuesTable th, #revenuesTable td { padding: 7px 2px; font-size: 13px; }
+            #revenueModal h3 { font-size: 18px; }
+        }
     </style>
 </head>
 <body>
@@ -336,6 +481,11 @@ $totalProducts = count($products);
                 <div class="card-icon">📄</div>
                 <div class="card-number" style="color:#6a5acd;font-size:28px;font-weight:bold;">Detail</div>
                 <div class="card-label">Detail Pesanan</div>
+            </div>
+            <div class="card" id="invoiceCard" style="cursor:pointer;">
+                <div class="card-icon">🧾</div>
+                <div class="card-number" style="color:#6a5acd;font-size:28px;font-weight:bold;">Invoice</div>
+                <div class="card-label">Invoice</div>
             </div>
             <div class="card" id="revenueCard" style="cursor:pointer;">
                 <div class="card-icon">💰</div>
@@ -469,10 +619,9 @@ revenueCard.onclick = function() {
   fetch('revenues_data.php')
     .then(res => res.json())
     .then(data => {
-      let html = `<table style='width:100%;font-size:14px;border-collapse:collapse;'>`;
-      html += `<thead><tr style='background:#f0f0f8;color:#333;'><th style='padding:6px 4px;text-align:left;'>Tanggal</th><th style='padding:6px 4px;text-align:right;'>Nominal</th><th style='padding:6px 4px;text-align:left;'>Keterangan</th></tr></thead><tbody>`;
+      let html = `<table><thead><tr><th>Tanggal</th><th>Nominal</th><th>Keterangan</th></tr></thead><tbody>`;
       data.forEach(r => {
-        html += `<tr><td style='padding:4px 2px;'>${r.tanggal}</td><td style='padding:4px 2px;text-align:right;'>Rp ${Number(r.nominal).toLocaleString('id-ID')}</td><td style='padding:4px 2px;'>${r.keterangan}</td></tr>`;
+        html += `<tr><td>${r.tanggal}</td><td>Rp ${Number(r.nominal).toLocaleString('id-ID')}</td><td>${r.keterangan}</td></tr>`;
       });
       html += `</tbody></table>`;
       document.getElementById('revenuesTable').innerHTML = html;
@@ -506,8 +655,7 @@ detailOrdersCard.onclick = function() {
   fetch('detail_orders.php')
     .then(res => res.json())
     .then(data => {
-      let html = `<table style='width:100%;font-size:14px;border-collapse:collapse;'>`;
-      html += `<thead><tr style='background:#f0f0f8;color:#333;'><th style='padding:6px 4px;text-align:left;'>No</th><th style='padding:6px 4px;text-align:left;'>Name</th><th style='padding:6px 4px;text-align:left;'>Product</th><th style='padding:6px 4px;text-align:center;'>Quantity</th><th style='padding:6px 4px;text-align:center;'>Unit Price</th><th style='padding:6px 4px;text-align:center;'>Total Price</th><th style='padding:6px 4px;text-align:center;'>Status</th></tr></thead><tbody>`;
+      let html = `<table><thead><tr><th>No</th><th>Nama</th><th>Produk</th><th>Jumlah</th><th>Harga Satuan</th><th>Total Harga</th><th>Status</th></tr></thead><tbody>`;
       data.forEach((o, i) => {
         html += `<tr><td style='padding:4px 2px;'>${i+1}</td><td style='padding:4px 2px;'>${o.name}</td><td style='padding:4px 2px;'>${o.product}</td><td style='padding:4px 2px;text-align:center;'>${o.quantity}</td><td style='padding:4px 2px;text-align:center;'>Rp ${Number(o.unit_price).toLocaleString('id-ID')}</td><td style='padding:4px 2px;text-align:center;font-weight:bold;color:#6a5acd;'>Rp ${Number(o.total_price).toLocaleString('id-ID')}</td><td style='padding:4px 2px;text-align:center;'>${o.status}</td></tr>`;
       });
@@ -532,6 +680,10 @@ const addProductCard = document.getElementById('addProductCard');
 const addProductModal = document.getElementById('addProductModal');
 addProductCard.onclick = function() {
     addProductModal.style.display = 'flex';
+};
+const invoiceCard = document.getElementById('invoiceCard');
+invoiceCard.onclick = function() {
+    window.open('invoice.php', '_blank');
 };
 </script>
 </body>

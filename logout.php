@@ -1,10 +1,9 @@
 <?php
 session_start();
-
-// Destroy all session data
+// Hapus semua data session
+session_unset();
 session_destroy();
-
-// Redirect to login page
-header("Location: login.php");
+// Redirect ke halaman login
+header('Location: login.php');
 exit();
 ?> 

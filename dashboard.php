@@ -452,6 +452,7 @@ $totalProducts = count($products);
         <div class="navbar-left">☕ Toko Alat Kopi - Admin Dashboard</div>
         <div class="navbar-right">
             <a href="dashboard.php">Dashboard</a>
+            <a href="profile.php">Profil</a>
             <a href="logout.php" id="logoutLink">Logout</a>
         </div>
     </div>

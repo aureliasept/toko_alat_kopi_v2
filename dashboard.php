@@ -452,7 +452,7 @@ $totalProducts = count($products);
         <div class="navbar-left">☕ Toko Alat Kopi - Admin Dashboard</div>
         <div class="navbar-right">
             <a href="dashboard.php">Dashboard</a>
-            <a href="logout.php">Logout</a>
+            <a href="logout.php" id="logoutLink">Logout</a>
         </div>
     </div>
 
@@ -591,6 +591,15 @@ $totalProducts = count($products);
         <div id="detailOrdersTable"></div>
       </div>
     </div>
+<!-- Modal Konfirmasi Logout -->
+<div id="logoutModal" style="display:none;position:fixed;z-index:99999;left:0;top:0;width:100vw;height:100vh;background:rgba(60,60,90,0.18);backdrop-filter:blur(2px);align-items:center;justify-content:center;">
+  <div style="background:#fff;padding:32px 24px 24px 24px;border-radius:16px;max-width:340px;width:92vw;box-shadow:0 8px 32px rgba(123,47,242,0.13);text-align:center;animation:popIn 0.25s;position:relative;">
+    <h3 style="margin-top:0;margin-bottom:18px;font-size:20px;color:#6a5acd;font-weight:700;">Konfirmasi Logout</h3>
+    <div style="font-size:15px;color:#333;margin-bottom:22px;">Yakin ingin logout?</div>
+    <button id="confirmLogoutBtn" style="background:linear-gradient(90deg,#6a5acd,#7b2ff2);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;padding:10px 28px;cursor:pointer;margin-right:10px;">Logout</button>
+    <button id="cancelLogoutBtn" style="background:#eee;color:#6a5acd;border:none;border-radius:8px;font-size:15px;font-weight:600;padding:10px 22px;cursor:pointer;">Batal</button>
+  </div>
+</div>
 <script>
 // Pesanan
 const ordersCard = document.getElementById('totalOrdersCard');
@@ -684,6 +693,25 @@ addProductCard.onclick = function() {
 const invoiceCard = document.getElementById('invoiceCard');
 invoiceCard.onclick = function() {
     window.open('invoice.php', '_blank');
+};
+// Intercept klik Logout
+const logoutLink = document.getElementById('logoutLink');
+const logoutModal = document.getElementById('logoutModal');
+const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+logoutLink.onclick = function(e) {
+  e.preventDefault();
+  logoutModal.style.display = 'flex';
+};
+confirmLogoutBtn.onclick = function() {
+  window.location.href = 'logout.php';
+};
+cancelLogoutBtn.onclick = function() {
+  logoutModal.style.display = 'none';
+};
+// Tutup modal jika klik di luar box
+logoutModal.onclick = function(e) {
+  if (e.target === logoutModal) logoutModal.style.display = 'none';
 };
 </script>
 </body>

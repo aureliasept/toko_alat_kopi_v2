@@ -307,9 +307,6 @@ $totalProducts = count($products);
         <div class="navbar-left">☕ Toko Alat Kopi - Admin Dashboard</div>
         <div class="navbar-right">
             <a href="dashboard.php">Dashboard</a>
-            <a href="#">Produk</a>
-            <a href="#">Pesanan</a>
-            <a href="#">Laporan</a>
             <a href="logout.php">Logout</a>
         </div>
     </div>
@@ -334,6 +331,11 @@ $totalProducts = count($products);
                 <div class="card-icon">🛒</div>
                 <div class="card-number"><?php echo $totalOrders; ?></div>
                 <div class="card-label">Total Pesanan</div>
+            </div>
+            <div class="card" id="detailOrdersCard" style="cursor:pointer;">
+                <div class="card-icon">📄</div>
+                <div class="card-number" style="color:#6a5acd;font-size:28px;font-weight:bold;">Detail</div>
+                <div class="card-label">Detail Pesanan</div>
             </div>
             <div class="card" id="revenueCard" style="cursor:pointer;">
                 <div class="card-icon">💰</div>
@@ -431,6 +433,14 @@ $totalProducts = count($products);
         </ul>
       </div>
     </div>
+    <!-- Modal Detail Pesanan -->
+    <div id="detailOrdersModal" style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100vw;height:100vh;background:rgba(60,60,90,0.18);backdrop-filter:blur(2px);align-items:center;justify-content:center;">
+      <div style="background:#fff;padding:32px 20px 20px 20px;border-radius:16px;max-width:600px;width:96vw;max-height:82vh;overflow-y:auto;position:relative;box-shadow:0 8px 32px rgba(123,47,242,0.13);animation:popIn 0.25s;">
+        <h3 style="margin-top:0;margin-bottom:15px;font-size:22px;color:#6a5acd;font-weight:700;">Detail Seluruh Pesanan</h3>
+        <button onclick="document.getElementById('detailOrdersModal').style.display='none'" style="position:absolute;top:10px;right:15px;font-size:20px;background:none;border:none;cursor:pointer;color:#6a5acd;">&times;</button>
+        <div id="detailOrdersTable"></div>
+      </div>
+    </div>
 <script>
 // Pesanan
 const ordersCard = document.getElementById('totalOrdersCard');
@@ -489,6 +499,22 @@ pendingOrdersCard.onclick = function() {
 const productsCard = document.getElementById('totalProductsCard');
 productsCard.onclick = function() {
   document.getElementById('productsModal').style.display = 'flex';
+};
+// Detail Orders (English, with total price)
+const detailOrdersCard = document.getElementById('detailOrdersCard');
+detailOrdersCard.onclick = function() {
+  fetch('detail_orders.php')
+    .then(res => res.json())
+    .then(data => {
+      let html = `<table style='width:100%;font-size:14px;border-collapse:collapse;'>`;
+      html += `<thead><tr style='background:#f0f0f8;color:#333;'><th style='padding:6px 4px;text-align:left;'>No</th><th style='padding:6px 4px;text-align:left;'>Name</th><th style='padding:6px 4px;text-align:left;'>Product</th><th style='padding:6px 4px;text-align:center;'>Quantity</th><th style='padding:6px 4px;text-align:center;'>Unit Price</th><th style='padding:6px 4px;text-align:center;'>Total Price</th><th style='padding:6px 4px;text-align:center;'>Status</th></tr></thead><tbody>`;
+      data.forEach((o, i) => {
+        html += `<tr><td style='padding:4px 2px;'>${i+1}</td><td style='padding:4px 2px;'>${o.name}</td><td style='padding:4px 2px;'>${o.product}</td><td style='padding:4px 2px;text-align:center;'>${o.quantity}</td><td style='padding:4px 2px;text-align:center;'>Rp ${Number(o.unit_price).toLocaleString('id-ID')}</td><td style='padding:4px 2px;text-align:center;font-weight:bold;color:#6a5acd;'>Rp ${Number(o.total_price).toLocaleString('id-ID')}</td><td style='padding:4px 2px;text-align:center;'>${o.status}</td></tr>`;
+      });
+      html += `</tbody></table>`;
+      document.getElementById('detailOrdersTable').innerHTML = html;
+      document.getElementById('detailOrdersModal').style.display = 'flex';
+    });
 };
 document.getElementById('fotoInputDashboard').onchange = function(e) {
     if (e.target.files && e.target.files[0]) {
